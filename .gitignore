@@ -1,0 +1,42 @@
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Docker data volume
+data/
+
+# TLS certificates
+certs/
+*.pem
+*.key
+*.crt
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+
+# Logs
+logs/
+*.log
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/

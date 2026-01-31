@@ -1,0 +1,34 @@
+services:
+  openclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: openclaw:allinone
+    container_name: openclaw
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
+      # SSH access (optional, enable with OPENCLAW_SSH_ENABLED=true)
+      # - "2222:22"
+    volumes:
+      - ./data:/home/node/.openclaw
+      # Custom TLS certificates (optional)
+      # - ./certs/cert.pem:/certs/cert.pem:ro
+      # - ./certs/key.pem:/certs/key.pem:ro
+      # SSH authorized keys file (optional)
+      # - ./authorized_keys:/ssh/authorized_keys:ro
+    env_file:
+      - .env
+    # Docker secrets (alternative to mounting files)
+    # secrets:
+    #   - tls_cert
+    #   - tls_key
+    #   - ssh_authorized_keys
+
+# secrets:
+#   tls_cert:
+#     file: ./certs/cert.pem
+#   tls_key:
+#     file: ./certs/key.pem
+#   ssh_authorized_keys:
+#     file: ./authorized_keys
