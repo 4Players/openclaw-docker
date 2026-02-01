@@ -1,5 +1,7 @@
 # OpenClaw All-in-One Docker 🦞
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/fourplayers/openclaw.svg?maxAge=604800)](https://hub.docker.com/r/fourplayers/openclaw/)
+
 A ready-to-deploy Docker image for [OpenClaw](https://github.com/openclaw/openclaw), the powerful open-source AI assistant that brings Claude and GPT to your favorite messaging apps. Built for [ODIN Fleet](https://odin.4players.io/fleet/) and any Docker-compatible platform.
 
 **Features:**
