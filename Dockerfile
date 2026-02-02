@@ -12,6 +12,7 @@ RUN npm install -g openclaw@latest
 # Add supervisord config and entrypoint script
 COPY docker/supervisord.conf /etc/supervisor/conf.d/openclaw.conf
 COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/patch-config.js /patch-config.js
 RUN chmod +x /entrypoint.sh
 
 # Environment setup

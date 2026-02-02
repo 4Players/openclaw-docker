@@ -182,3 +182,13 @@ docker compose up -d
 docker compose logs -f                 # View logs
 rm -rf ./data && docker compose up -d  # Reset and re-run setup
 ```
+
+**Permission denied on `./data` directory:**
+
+If you see `EACCES: permission denied` errors for `/home/node/.openclaw/openclaw.json`, fix the data directory permissions:
+
+```bash
+sudo chown -R 1000:1000 ./data
+```
+
+The `node` user inside the container has UID 1000. This is common on Linux hosts where Docker creates the directory as root.

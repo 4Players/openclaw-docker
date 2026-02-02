@@ -27,8 +27,16 @@ fi
 # Set HOME for node user
 export HOME=/home/node
 CONFIG_FILE="$HOME/.openclaw/openclaw.json"
-mkdir -p "$(dirname "$CONFIG_FILE")"
-chown -R node:node "$HOME" 2>/dev/null || true
+mkdir -p "$HOME/.openclaw"
+
+# Fix ownership on data directory BEFORE setup so node user can write
+if [ "$(id -u)" = "0" ]; then
+  chown -R node:node "$HOME/.openclaw" || {
+    echo "Error: Could not set permissions on data directory." >&2
+    echo "Run 'sudo chown -R 1000:1000 ./data' on the host." >&2
+    exit 1
+  }
+fi
 
 # Set defaults
 export OPENCLAW_GATEWAY_HOST="${OPENCLAW_GATEWAY_HOST:-localhost}"
@@ -103,7 +111,8 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
     ONBOARD_ARGS+=(--auth-choice "${OPENCLAW_AUTH_CHOICE:-skip}")
   fi
 
-  openclaw onboard "${ONBOARD_ARGS[@]}"
+  # Run onboard as node user so files are created with correct ownership
+  runuser -u node -- openclaw onboard "${ONBOARD_ARGS[@]}"
 
   # Post-setup configuration
   if [ -f "$CONFIG_FILE" ]; then
@@ -116,33 +125,7 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
     export TLS_CERT_PATH TLS_KEY_PATH
 
     export OPENCLAW_MODEL="${OPENCLAW_MODEL:-}"
-    node <<'NODE'
-const fs = require('fs');
-
-const file = process.env.CONFIG_FILE;
-const config = JSON.parse(fs.readFileSync(file, 'utf8'));
-
-config.gateway ??= {};
-config.gateway.controlUi ??= {};
-config.gateway.controlUi.dangerouslyDisableDeviceAuth = true;
-
-// Set model if specified
-if (process.env.OPENCLAW_MODEL) {
-  config.agent ??= {};
-  config.agent.model = process.env.OPENCLAW_MODEL;
-}
-
-const hasCustom = process.env.TLS_HAS_CUSTOM === 'true';
-const enabled = hasCustom || process.env.TLS_ENABLED === 'true';
-
-config.gateway.tls = hasCustom
-  ? { enabled: true, autoGenerate: false, certPath: process.env.TLS_CERT_PATH, keyPath: process.env.TLS_KEY_PATH }
-  : enabled
-    ? { enabled: true, autoGenerate: true }
-    : { enabled: false };
-
-fs.writeFileSync(file, JSON.stringify(config, null, 2));
-NODE
+    runuser -u node -- node /patch-config.js
 
     if [ "$HAS_CUSTOM_CERTS" = "true" ]; then
       echo "==> TLS enabled with custom certificates"
