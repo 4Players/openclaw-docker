@@ -2,7 +2,14 @@ FROM node:24
 
 # Install supervisor for process management and openssh-server for optional SSH access
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends supervisor openssh-server && \
+    apt-get install -y --no-install-recommends \
+    supervisor \
+    openssh-server \
+    chromium-headless-shell \
+    fonts-liberation fonts-noto-color-emoji \
+    libatk-bridge2.0-0 \
+    ffmpeg imagemagick \
+    && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     mkdir -p /run/sshd
 
