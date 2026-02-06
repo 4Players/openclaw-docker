@@ -127,6 +127,9 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
     export OPENCLAW_MODEL="${OPENCLAW_MODEL:-}"
     runuser -u node -- node /patch-config.js
 
+    # Migrate any remaining legacy config keys
+    runuser -u node -- openclaw doctor --fix 2>/dev/null || true
+
     if [ "$HAS_CUSTOM_CERTS" = "true" ]; then
       echo "==> TLS enabled with custom certificates"
     elif [ "${OPENCLAW_TLS_ENABLED:-false}" = "true" ]; then

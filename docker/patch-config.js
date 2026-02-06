@@ -8,11 +8,16 @@ config.gateway ??= {};
 config.gateway.controlUi ??= {};
 config.gateway.controlUi.dangerouslyDisableDeviceAuth = true;
 
-// Set model if specified
+// Set model if specified (new config format: agents.defaults.model.primary)
 if (process.env.OPENCLAW_MODEL) {
-  config.agent ??= {};
-  config.agent.model = process.env.OPENCLAW_MODEL;
+  config.agents ??= {};
+  config.agents.defaults ??= {};
+  config.agents.defaults.model ??= {};
+  config.agents.defaults.model.primary = process.env.OPENCLAW_MODEL;
 }
+
+// Remove legacy agent key if present (onboard may still generate it)
+delete config.agent;
 
 const hasCustom = process.env.TLS_HAS_CUSTOM === 'true';
 const enabled = hasCustom || process.env.TLS_ENABLED === 'true';
