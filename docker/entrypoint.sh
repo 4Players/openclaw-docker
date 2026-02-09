@@ -106,7 +106,7 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
   elif [ -n "${OPENAI_API_KEY:-}" ]; then
     ONBOARD_ARGS+=(--auth-choice openai-api-key --openai-api-key "${OPENAI_API_KEY}")
     # Default to OpenAI model when using OpenAI API key
-    export OPENCLAW_MODEL="${OPENCLAW_MODEL:-openai/gpt-4o}"
+    export OPENCLAW_MODEL="${OPENCLAW_MODEL:-openai/gpt-5-nano}"
   else
     ONBOARD_ARGS+=(--auth-choice "${OPENCLAW_AUTH_CHOICE:-skip}")
   fi
