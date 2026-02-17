@@ -54,6 +54,8 @@ This folder contains:
 | `OPENCLAW_TLS_ENABLED`         | Enable HTTPS                     | `false`        |
 | `OPENCLAW_SKIP_ONBOARD`        | Skip auto-setup (for OAuth)      | `false`        |
 | `OPENCLAW_MODEL`               | AI model to use                  | Auto-detected  |
+| `OPENCLAW_AUTO_UPDATE`         | Auto-update on startup           | `false`        |
+| `OPENCLAW_UPDATE_CHANNEL`      | Update channel                   | `stable`       |
 | `OPENCLAW_SSH_ENABLED`         | Enable SSH server                | `false`        |
 | `OPENCLAW_SSH_PORT`            | SSH server port                  | `22`           |
 | `OPENCLAW_SSH_AUTHORIZED_KEYS` | SSH public keys (one per line)   | -              |
@@ -163,6 +165,22 @@ docker compose exec openclaw openclaw <command>
 ```
 
 ## Updating
+
+### Auto-update on startup
+
+Set `OPENCLAW_AUTO_UPDATE=true` to automatically run `openclaw update` every time the container starts. This keeps OpenClaw at the latest version without rebuilding the image.
+
+```bash
+OPENCLAW_AUTO_UPDATE=true
+```
+
+You can also choose a release channel (`stable`, `beta`, or `dev`):
+
+```bash
+OPENCLAW_UPDATE_CHANNEL=beta
+```
+
+### Manual update
 
 ```bash
 docker compose pull

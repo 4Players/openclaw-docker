@@ -5,6 +5,7 @@ const file = process.env.CONFIG_FILE;
 const config = JSON.parse(fs.readFileSync(file, 'utf8'));
 
 config.gateway ??= {};
+config.gateway.mode = "local";
 config.gateway.controlUi ??= {};
 config.gateway.controlUi.dangerouslyDisableDeviceAuth = true;
 
