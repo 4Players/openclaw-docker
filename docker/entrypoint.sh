@@ -37,6 +37,11 @@ if [ "$(id -u)" = "0" ]; then
   }
 fi
 
+# Default to OpenAI model when using OpenAI API key (without explicit OPENCLAW_MODEL)
+if [ -z "${OPENCLAW_MODEL:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -n "${OPENAI_API_KEY:-}" ]; then
+  export OPENCLAW_MODEL="openai/gpt-5-nano"
+fi
+
 # Auto-update OpenClaw if enabled
 if [ "${OPENCLAW_AUTO_UPDATE:-false}" = "true" ]; then
   echo "==> Auto-updating OpenClaw..."
@@ -143,8 +148,6 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
     ONBOARD_ARGS+=(--auth-choice apiKey --anthropic-api-key "${ANTHROPIC_API_KEY}")
   elif [ -n "${OPENAI_API_KEY:-}" ]; then
     ONBOARD_ARGS+=(--auth-choice openai-api-key --openai-api-key "${OPENAI_API_KEY}")
-    # Default to OpenAI model when using OpenAI API key
-    export OPENCLAW_MODEL="${OPENCLAW_MODEL:-openai/gpt-5-nano}"
   else
     ONBOARD_ARGS+=(--auth-choice "${OPENCLAW_AUTH_CHOICE:-skip}")
   fi
