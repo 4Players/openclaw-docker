@@ -8,6 +8,7 @@ config.gateway ??= {};
 config.gateway.mode = "local";
 config.gateway.controlUi ??= {};
 config.gateway.controlUi.dangerouslyDisableDeviceAuth = true;
+config.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback = true;
 
 // Set model if specified (new config format: agents.defaults.model.primary)
 if (process.env.OPENCLAW_MODEL) {
