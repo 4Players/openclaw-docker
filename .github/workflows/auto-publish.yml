@@ -59,6 +59,45 @@ jobs:
         if: steps.check-tag.outputs.exists == 'false' || steps.files-changed.outputs.changed == 'true'
         uses: docker/setup-buildx-action@v3
 
+      - name: Build test image (amd64 only)
+        if: steps.check-tag.outputs.exists == 'false' || steps.files-changed.outputs.changed == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: openclaw:smoke-test
+
+      - name: Smoke test — verify OpenClaw gateway starts
+        if: steps.check-tag.outputs.exists == 'false' || steps.files-changed.outputs.changed == 'true'
+        run: |
+          docker run -d --name openclaw-smoke \
+            -p 18789:18789 \
+            -e OPENCLAW_GATEWAY_TOKEN=smoketoken \
+            -e ANTHROPIC_API_KEY=sk-ant-smoke000000000000000000000000000000000000000000000000 \
+            openclaw:smoke-test
+
+          echo "Waiting for OpenClaw gateway to respond..."
+          for i in $(seq 1 30); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:18789/ 2>/dev/null || true)
+            if [ -n "$HTTP_CODE" ] && [ "$HTTP_CODE" != "000" ]; then
+              echo "Gateway is up (HTTP $HTTP_CODE) after $i attempt(s)"
+              break
+            fi
+            if [ "$i" = "30" ]; then
+              echo "Timeout: gateway did not respond within 60 seconds"
+              docker logs openclaw-smoke
+              docker stop openclaw-smoke || true
+              docker rm openclaw-smoke || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          docker stop openclaw-smoke
+          docker rm openclaw-smoke
+          echo "Smoke test passed."
+
       - name: Log in to Docker Hub
         if: steps.check-tag.outputs.exists == 'false' || steps.files-changed.outputs.changed == 'true'
         uses: docker/login-action@v3
