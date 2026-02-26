@@ -192,4 +192,15 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
   fi
 fi
 
+# Always patch config on every start to ensure settings are applied
+if [ -f "$CONFIG_FILE" ]; then
+  export CONFIG_FILE
+  export TLS_ENABLED="${OPENCLAW_TLS_ENABLED:-false}"
+  export TLS_HAS_CUSTOM="$HAS_CUSTOM_CERTS"
+  export TLS_CERT_PATH TLS_KEY_PATH
+  export OPENCLAW_MODEL="${OPENCLAW_MODEL:-}"
+  runuser -u node -- node /patch-config.js
+  runuser -u node -- openclaw doctor --fix 2>/dev/null || true
+fi
+
 exec "$@"
