@@ -28,10 +28,10 @@ fi
 export HOME=/home/node
 mkdir -p "$HOME/.openclaw"
 
-# Fix ownership on data directory so node user can write
+# Fix ownership on home directory so node user can write to all of it
 if [ "$(id -u)" = "0" ]; then
-  chown -R node:node "$HOME/.openclaw" || {
-    echo "Error: Could not set permissions on data directory." >&2
+  chown -R node:node "$HOME" || {
+    echo "Error: Could not set permissions on home directory." >&2
     echo "Run 'sudo chown -R 1000:1000 ./data' on the host." >&2
     exit 1
   }
@@ -52,7 +52,7 @@ if [ "${OPENCLAW_AUTO_UPDATE:-false}" = "true" ]; then
 
   # Fix ownership after update (openclaw update runs as root and may recreate files)
   if [ "$(id -u)" = "0" ]; then
-    chown -R node:node "$HOME/.openclaw" 2>/dev/null || true
+    chown -R node:node "$HOME" 2>/dev/null || true
   fi
 
   # Re-patch config after update, since openclaw update can overwrite it
