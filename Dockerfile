@@ -45,7 +45,7 @@ RUN chmod +x /entrypoint.sh
 ENV NODE_ENV=production
 ENV HOME=/home/node
 ENV TERM=xterm-256color
-ENV PATH=/usr/local/go/bin:$PATH
+ENV PATH=/usr/local/go/bin:/home/node/go/bin:$PATH
 
 # Create data directory for OpenClaw config and generated certs
 RUN mkdir -p /home/node/.openclaw && \
