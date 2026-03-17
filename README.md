@@ -7,7 +7,7 @@ A ready-to-deploy Docker image for [OpenClaw](https://github.com/openclaw/opencl
 **Features:**
 - Zero-config startup — auto-configures on first run
 - HTTPS support with auto-generated or custom certificates
-- Supports Anthropic and OpenAI APIs
+- Supports Anthropic, OpenAI, and Google Gemini APIs
 - Connect WhatsApp, Telegram, Discord, Slack, and more
 - Persistent storage for seamless container restarts
 
@@ -50,6 +50,7 @@ This folder contains:
 | `OPENCLAW_GATEWAY_TOKEN`       | Gateway token (machine-friendly) | Auto-generated |
 | `ANTHROPIC_API_KEY`            | Anthropic API key                | -              |
 | `OPENAI_API_KEY`               | OpenAI API key                   | -              |
+| `GEMINI_API_KEY`               | Google Gemini API key            | -              |
 | `OPENCLAW_AUTH_CHOICE`         | Auth provider if no API key      | `skip`         |
 | `OPENCLAW_TLS_ENABLED`         | Enable HTTPS                     | `false`        |
 | `OPENCLAW_SKIP_ONBOARD`        | Skip auto-setup (for OAuth)      | `false`        |

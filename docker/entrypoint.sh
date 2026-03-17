@@ -42,6 +42,11 @@ if [ -z "${OPENCLAW_MODEL:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -n "${OP
   export OPENCLAW_MODEL="openai/gpt-5-nano"
 fi
 
+# Default to Gemini model when using Gemini API key (without explicit OPENCLAW_MODEL)
+if [ -z "${OPENCLAW_MODEL:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -z "${OPENAI_API_KEY:-}" ] && [ -n "${GEMINI_API_KEY:-}" ]; then
+  export OPENCLAW_MODEL="google/gemini-2.0-flash"
+fi
+
 # Auto-update OpenClaw if enabled
 if [ "${OPENCLAW_AUTO_UPDATE:-false}" = "true" ]; then
   echo "==> Auto-updating OpenClaw..."
@@ -148,6 +153,8 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
     ONBOARD_ARGS+=(--auth-choice apiKey --anthropic-api-key "${ANTHROPIC_API_KEY}")
   elif [ -n "${OPENAI_API_KEY:-}" ]; then
     ONBOARD_ARGS+=(--auth-choice openai-api-key --openai-api-key "${OPENAI_API_KEY}")
+  elif [ -n "${GEMINI_API_KEY:-}" ]; then
+    ONBOARD_ARGS+=(--auth-choice gemini-api-key --gemini-api-key "${GEMINI_API_KEY}")
   else
     ONBOARD_ARGS+=(--auth-choice "${OPENCLAW_AUTH_CHOICE:-skip}")
   fi
