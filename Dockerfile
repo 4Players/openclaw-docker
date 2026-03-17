@@ -47,6 +47,9 @@ ENV HOME=/home/node
 ENV TERM=xterm-256color
 ENV PATH=/usr/local/go/bin:/home/node/go/bin:$PATH
 
+# Bake build timestamp into image (used to detect image updates at runtime)
+RUN date -u +%Y-%m-%dT%H:%M:%SZ > /IMAGE_BUILD_DATE
+
 # Create data directory for OpenClaw config and generated certs
 RUN mkdir -p /home/node/.openclaw && \
     chown -R node:node /home/node

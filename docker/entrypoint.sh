@@ -47,15 +47,13 @@ if [ -z "${OPENCLAW_MODEL:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -z "${OP
   export OPENCLAW_MODEL="google/gemini-2.0-flash"
 fi
 
-# Auto-update OpenClaw if enabled
-if [ "${OPENCLAW_AUTO_UPDATE:-false}" = "true" ]; then
-  echo "==> Auto-updating OpenClaw..."
-  # || true: update may exit non-zero when it tries to restart via systemctl,
-  # which doesn't exist in the container. The restart is unnecessary since
-  # the entrypoint will start the service fresh via exec "$@".
+# Run openclaw update and re-patch config afterwards.
+# || true: update may exit non-zero when it tries to restart via systemctl,
+# which doesn't exist in the container. The restart is unnecessary since
+# the entrypoint will start the service fresh via exec "$@".
+run_update() {
   openclaw update --channel "${OPENCLAW_UPDATE_CHANNEL:-stable}" || true
 
-  # Fix ownership after update (openclaw update runs as root and may recreate files)
   if [ "$(id -u)" = "0" ]; then
     chown -R node:node "$HOME" 2>/dev/null || true
   fi
@@ -82,6 +80,27 @@ if [ "${OPENCLAW_AUTO_UPDATE:-false}" = "true" ]; then
   fi
 
   echo "==> Update complete."
+}
+
+# Auto-update when the image has been rebuilt (new build date detected)
+LAST_IMAGE_UPDATE_FILE="$HOME/.openclaw/.last_image_update"
+if [ -f "/IMAGE_BUILD_DATE" ]; then
+  IMAGE_BUILD_DATE="$(cat /IMAGE_BUILD_DATE)"
+  LAST_UPDATE_DATE="$(cat "$LAST_IMAGE_UPDATE_FILE" 2>/dev/null || echo "")"
+  if [ -z "$LAST_UPDATE_DATE" ] || [ "$IMAGE_BUILD_DATE" \> "$LAST_UPDATE_DATE" ]; then
+    echo "==> New image detected (built: $IMAGE_BUILD_DATE), updating OpenClaw..."
+    run_update
+    echo "$IMAGE_BUILD_DATE" > "$LAST_IMAGE_UPDATE_FILE"
+    if [ "$(id -u)" = "0" ]; then
+      chown node:node "$LAST_IMAGE_UPDATE_FILE" 2>/dev/null || true
+    fi
+  fi
+fi
+
+# Auto-update OpenClaw if enabled
+if [ "${OPENCLAW_AUTO_UPDATE:-false}" = "true" ]; then
+  echo "==> Auto-updating OpenClaw..."
+  run_update
 fi
 
 CONFIG_FILE="$HOME/.openclaw/openclaw.json"
