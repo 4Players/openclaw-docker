@@ -71,10 +71,12 @@ jobs:
       - name: Smoke test — verify OpenClaw gateway starts
         if: steps.check-tag.outputs.exists == 'false' || steps.files-changed.outputs.changed == 'true'
         run: |
+          date -u +%Y-%m-%dT%H:%M:%SZ > /tmp/last_image_update
           docker run -d --name openclaw-smoke \
             -p 18789:18789 \
             -e OPENCLAW_GATEWAY_TOKEN=smoketoken \
             -e ANTHROPIC_API_KEY=sk-ant-smoke000000000000000000000000000000000000000000000000 \
+            -v /tmp/last_image_update:/home/node/.openclaw/.last_image_update:ro \
             openclaw:smoke-test
 
           echo "Waiting for OpenClaw gateway to respond..."
