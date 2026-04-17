@@ -147,6 +147,8 @@ elif [ -f "/certs/cert.pem" ] && [ -f "/certs/key.pem" ]; then
   echo "==> Found TLS certificates (mounted)"
 fi
 
+_config_patched=false
+
 # Run onboard if not configured and not skipped
 if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; then
   echo "==> Running auto-setup..."
@@ -196,6 +198,7 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
 
     # Migrate any remaining legacy config keys
     runuser -u node -- openclaw doctor --fix 2>/dev/null || true
+    _config_patched=true
 
     if [ "$HAS_CUSTOM_CERTS" = "true" ]; then
       echo "==> TLS enabled with custom certificates"
@@ -219,7 +222,7 @@ if [ ! -f "$CONFIG_FILE" ] && [ "${OPENCLAW_SKIP_ONBOARD:-false}" != "true" ]; t
 fi
 
 # Always patch config on every start to ensure settings are applied
-if [ -f "$CONFIG_FILE" ]; then
+if [ -f "$CONFIG_FILE" ] && [ "$_config_patched" = "false" ]; then
   export CONFIG_FILE
   export TLS_ENABLED="${OPENCLAW_TLS_ENABLED:-false}"
   export TLS_HAS_CUSTOM="$HAS_CUSTOM_CERTS"
